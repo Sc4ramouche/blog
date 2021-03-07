@@ -11,6 +11,6 @@ module.exports = {
     description:
       'A wee corner where I share thoughts, experience, and review books I read.',
   },
-  plugins: [],
+  plugins: ['gatsby-plugin-react-helmet'],
   pathPrefix: '/blog',
 };
