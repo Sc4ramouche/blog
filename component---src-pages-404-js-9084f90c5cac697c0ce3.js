@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[3],{w2l6:function(n,t,e){"use strict";e.r(t);var a=e("q1tI"),o=e.n(a);t.default=function(){return o.a.createElement("div",null,"Not found! TODO: Add a way to get back to the main page ↩")}}}]);
+//# sourceMappingURL=component---src-pages-404-js-9084f90c5cac697c0ce3.js.map
