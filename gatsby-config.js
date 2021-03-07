@@ -6,6 +6,11 @@
 
 module.exports = {
   /* Your site config here */
+  siteMetadata: {
+    title: 'Sc4ramouche Blog',
+    description:
+      'A wee corner where I share thoughts, experience, and review books I read.',
+  },
   plugins: [],
   pathPrefix: '/blog',
 };
