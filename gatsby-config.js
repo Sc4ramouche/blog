@@ -11,6 +11,14 @@ module.exports = {
     description:
       'A wee corner where I share thoughts, experience, and review books I read.',
   },
-  plugins: ['gatsby-plugin-react-helmet'],
+  plugins: [
+    'gatsby-plugin-react-helmet',
+    'gatsby-plugin-mdx',
+    {
+      resolve: 'gatsby-source-filesystem',
+      options: { path: `${__dirname}/posts` },
+      name: 'posts',
+    },
+  ],
   pathPrefix: '/blog',
 };
