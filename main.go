@@ -1,18 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
-	"log"
-	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/russross/blackfriday/v2"
 )
 
 type Preview struct {
 	Title string
+	Link  string
 }
 
 type Post struct {
@@ -22,35 +21,41 @@ type Post struct {
 var templates = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
-	http.HandleFunc("/", homeHandler)
-	http.HandleFunc("/blog/", blogHandler)
-	http.ListenAndServe(":8080", nil)
+	files, _ := filepath.Glob("articles/*.md")
+	outputDir := "public"
+
+	os.Mkdir(outputDir, os.ModePerm)
+	generateHomepage(files, outputDir)
+
+	for _, file := range files {
+		generatePost(file, outputDir)
+	}
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	files, err := filepath.Glob("articles/*.md")
-	if err != nil {
-		log.Fatal("Failed to read articles.")
-	}
-
-	posts := []Preview{}
+func generateHomepage(files []string, outputDir string) {
+	previews := []Preview{}
 	for _, file := range files {
 		title := filepath.Base(file)
-		posts = append(posts, Preview{Title: title[:len(title)-3]})
+		title = strings.TrimSuffix(title, ".md")
+		link := title + ".html"
+		previews = append(previews, Preview{Title: title, Link: link})
 	}
-	templates.ExecuteTemplate(w, "index.html", posts)
+
+	indexFile, _ := os.Create(filepath.Join(outputDir, "index.html"))
+	defer indexFile.Close()
+
+	templates.ExecuteTemplate(indexFile, "index.html", previews)
 }
 
-func blogHandler(w http.ResponseWriter, r *http.Request) {
-	slug := r.URL.Path[len("/blog/"):]
-	content, err := os.ReadFile("articles/" + slug + ".md")
-	fmt.Println("DEB: ", slug, err)
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
+func generatePost(file string, outputDir string) {
+	content, _ := os.ReadFile(file)
 	htmlContent := blackfriday.Run(content)
-	post := Post{Body: template.HTML(htmlContent)}
+	title := filepath.Base(file)
+	titleHtml := strings.TrimSuffix(title, ".md") + ".html"
 
-	templates.ExecuteTemplate(w, "post.html", post)
+	post := Post{Body: template.HTML(htmlContent)}
+	postFile, _ := os.Create(filepath.Join(outputDir, titleHtml))
+	defer postFile.Close()
+
+	templates.ExecuteTemplate(postFile, "post.html", post)
 }
