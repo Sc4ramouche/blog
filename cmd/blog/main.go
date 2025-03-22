@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,7 +33,11 @@ func main() {
 	// for _, file := range files {
 	// 	generatePost(file, outputDir)
 	// }
-	markdown.ParseMarkdown("articles/we-are-not-writing-enough-software.md")
+	document, err := markdown.ParseFile("articles/we-are-not-writing-enough-software.md")
+	if err != nil {
+		log.Fatal("Failed to parse markdown", err)
+	}
+    fmt.Println(document.Render())
 }
 
 func generateHomepage(files []string, outputDir string) {
