@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/Sc4ramouche/blog/pkg/markdown"
 	"github.com/russross/blackfriday/v2"
 )
 
@@ -21,15 +22,16 @@ type Post struct {
 var templates = template.Must(template.ParseGlob("templates/*.html"))
 
 func main() {
-	files, _ := filepath.Glob("articles/*.md")
+	// files, _ := filepath.Glob("articles/*.md")
 	outputDir := "public"
 
 	os.Mkdir(outputDir, os.ModePerm)
-	generateHomepage(files, outputDir)
+	// generateHomepage(files, outputDir)
 
-	for _, file := range files {
-		generatePost(file, outputDir)
-	}
+	// for _, file := range files {
+	// 	generatePost(file, outputDir)
+	// }
+	markdown.ParseMarkdown("articles/we-are-not-writing-enough-software.md")
 }
 
 func generateHomepage(files []string, outputDir string) {
