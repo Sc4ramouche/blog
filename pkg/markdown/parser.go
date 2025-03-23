@@ -51,7 +51,10 @@ func parseHeading(line string) Node {
 }
 
 func parseParagraph(line string) Node {
-	traversed := traverseContent(line) // TODO: better name please
+	traversed, err := parseInlineContent(line) // TODO: better name please
+	if err != nil {
+		fmt.Println("Inline parse error:", err)
+	}
 	return &Paragraph{Children: traversed}
 }
 
@@ -62,7 +65,7 @@ const (
 	StateLink
 )
 
-func traverseContent(line string) []Node {
+func parseInlineContent(line string) ([]Node, error) {
 	var nodes []Node
 	state := StateText
 	var buffer strings.Builder
@@ -99,13 +102,21 @@ func traverseContent(line string) []Node {
 	}
 
 	if buffer.Len() != 0 {
-		switch state {
-		case StateText:
-			nodes = append(nodes, &Text{Content: buffer.String()})
-		case StateBold:
-			nodes = append(nodes, &Bold{Content: buffer.String()})
-		}
+		nodes = append(nodes, &Text{Content: buffer.String()})
 	}
 
-	return nodes
+	if state != StateText {
+		var unclosedTag string
+		switch state {
+		case StateBold:
+			unclosedTag = "**"
+		case StateItalic:
+			unclosedTag = "*"
+		case StateLink:
+			unclosedTag = "link"
+		}
+		return nodes, fmt.Errorf("Unclosed tag: %s", unclosedTag)
+	}
+
+	return nodes, nil
 }
