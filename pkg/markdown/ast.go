@@ -15,4 +15,15 @@ type Heading struct {
 
 type Paragraph struct {
 	Content string
+    Children []Node
+}
+
+// Inline Nodes
+
+type Text struct {
+    Content string
+}
+
+type Bold struct {
+    Content string
 }

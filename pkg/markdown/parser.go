@@ -2,6 +2,7 @@ package markdown
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
 )
@@ -50,5 +51,61 @@ func parseHeading(line string) Node {
 }
 
 func parseParagraph(line string) Node {
-	return &Paragraph{Content: line}
+	traversed := traverseContent(line) // TODO: better name please
+	return &Paragraph{Children: traversed}
+}
+
+const (
+	StateText = iota
+	StateBold
+	StateItalic
+	StateLink
+)
+
+func traverseContent(line string) []Node {
+	var nodes []Node
+	state := StateText
+	var buffer strings.Builder
+
+	for i := 0; i < len(line); i++ {
+		c := line[i]
+		if c == '*' && state != StateBold {
+			if i+1 < len(line) && line[i+1] == '*' {
+				nodes = append(nodes, &Text{Content: buffer.String()})
+				buffer.Reset()
+				state = StateBold
+				i = i + 1
+				continue
+			} else if state != StateItalic {
+				state = StateItalic
+			}
+		}
+
+		if c == '*' && state == StateBold {
+			if i+1 < len(line) && line[i+1] == '*' {
+				nodes = append(nodes, &Bold{Content: buffer.String()})
+				buffer.Reset()
+				state = StateText
+				i++
+				continue
+			}
+		}
+
+		// if c == '*' && state == StateItalic {
+		//
+		// }
+
+		buffer.WriteByte(c)
+	}
+
+	if buffer.Len() != 0 {
+		switch state {
+		case StateText:
+			nodes = append(nodes, &Text{Content: buffer.String()})
+		case StateBold:
+			nodes = append(nodes, &Bold{Content: buffer.String()})
+		}
+	}
+
+	return nodes
 }

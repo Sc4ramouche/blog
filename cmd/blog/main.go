@@ -33,7 +33,8 @@ func main() {
 	// for _, file := range files {
 	// 	generatePost(file, outputDir)
 	// }
-	document, err := markdown.ParseFile("articles/we-are-not-writing-enough-software.md")
+	// document, err := markdown.ParseFile("articles/we-are-not-writing-enough-software.md")
+	document, err := markdown.ParseFile("articles/test.md")
 	if err != nil {
 		log.Fatal("Failed to parse markdown", err)
 	}

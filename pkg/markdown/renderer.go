@@ -21,6 +21,20 @@ func (h *Heading) Render() string {
 
 func (p *Paragraph) Render() string {
 	var result strings.Builder
-	fmt.Fprintf(&result, "<p>%s</p>", p.Content)
+	fmt.Fprintf(&result, "<p>")
+	for _, n := range p.Children {
+		result.Write([]byte(n.Render()))
+	}
+	fmt.Fprintf(&result, "</p>")
+	return result.String()
+}
+
+func (t *Text) Render() string {
+	return t.Content
+}
+
+func (b *Bold) Render() string {
+	var result strings.Builder
+	fmt.Fprintf(&result, "<strong>%s</strong>", b.Content)
 	return result.String()
 }
