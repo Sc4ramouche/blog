@@ -28,8 +28,8 @@ type InlineNode interface {
 }
 
 type Text struct {
-	Content string
-    nodeType NodeType
+	Content  string
+	nodeType NodeType
 }
 
 func (t *Text) Type() NodeType {
@@ -38,14 +38,24 @@ func (t *Text) Type() NodeType {
 
 type Bold struct {
 	Children []Node
+	nodeType NodeType
+}
+
+func newBoldNode() *Bold {
+	return &Bold{Children: []Node{}, nodeType: BoldNode}
 }
 
 func (b *Bold) Type() NodeType {
-	return BoldNode
+	return b.nodeType
 }
 
 type Italic struct {
 	Children []Node
+	nodeType NodeType
+}
+
+func newItalicNode() *Italic {
+	return &Italic{Children: []Node{}, nodeType: ItalicNode}
 }
 
 func (i *Italic) Type() NodeType {
@@ -56,7 +66,7 @@ func appendContent(node InlineNode, content string) {
 	if content == "" {
 		return
 	}
-	
+
 	switch n := node.(type) {
 	case *Text:
 		n.Content += content

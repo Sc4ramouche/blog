@@ -51,11 +51,11 @@ func parseHeading(line string) Node {
 }
 
 func parseParagraph(line string) Node {
-	traversed, err := parseInlineContent(line)
+	inlineNodes, err := parseInlineContent(line)
 	if err != nil {
 		fmt.Println("Inline parse error:", err)
 	}
-	return &Paragraph{Children: traversed}
+	return &Paragraph{Children: inlineNodes}
 }
 
 // TODO: Debug view for AST could be handy
@@ -78,7 +78,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 				switch currentNode.(type) {
 				case nil:
 					nodes = append(nodes, newTextNode(buffer.String()))
-					nodesStack = append(nodesStack, &Bold{Children: []Node{}})
+					nodesStack = append(nodesStack, newBoldNode())
 				case *Bold:
 					if len(nodesStack) == 1 {
 						appendContent(currentNode, buffer.String())
@@ -93,14 +93,14 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 					}
 				default:
 					appendContent(currentNode, buffer.String())
-					nodesStack = append(nodesStack, &Bold{Children: []Node{}})
+					nodesStack = append(nodesStack, newBoldNode())
 				}
 				i++
 			} else {
 				switch currentNode.(type) {
 				case nil:
 					nodes = append(nodes, newTextNode(buffer.String()))
-					nodesStack = append(nodesStack, &Italic{Children: []Node{}})
+					nodesStack = append(nodesStack, newItalicNode())
 				case *Italic:
 					if len(nodesStack) == 1 {
 						appendContent(currentNode, buffer.String())
@@ -115,7 +115,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 					}
 				default:
 					appendContent(currentNode, buffer.String())
-					nodesStack = append(nodesStack, &Italic{Children: []Node{}})
+					nodesStack = append(nodesStack, newItalicNode())
 				}
 			}
 			buffer.Reset()
