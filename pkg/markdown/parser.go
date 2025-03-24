@@ -51,52 +51,76 @@ func parseHeading(line string) Node {
 }
 
 func parseParagraph(line string) Node {
-	traversed, err := parseInlineContent(line) // TODO: better name please
+	traversed, err := parseInlineContent(line)
 	if err != nil {
 		fmt.Println("Inline parse error:", err)
 	}
 	return &Paragraph{Children: traversed}
 }
 
-const (
-	StateText = iota
-	StateBold
-	StateItalic
-	StateLink
-)
-
-func parseInlineContent(line string) ([]Node, error) {
-	var nodes []Node
-	state := StateText
+// TODO: Debug view for AST could be handy
+func parseInlineContent(line string) ([]InlineNode, error) {
+	var nodes []InlineNode
+	nodesStack := []InlineNode{}
 	var buffer strings.Builder
 
 	for i := 0; i < len(line); i++ {
 		c := line[i]
-		if c == '*' && state != StateBold {
-			if i+1 < len(line) && line[i+1] == '*' {
-				nodes = append(nodes, &Text{Content: buffer.String()})
-				buffer.Reset()
-				state = StateBold
-				i = i + 1
-				continue
-			} else if state != StateItalic {
-				state = StateItalic
-			}
+		var currentNode InlineNode
+		if len(nodesStack) != 0 {
+			currentNode = nodesStack[len(nodesStack)-1]
+		} else {
+			currentNode = nil
 		}
 
-		if c == '*' && state == StateBold {
+		if c == '*' {
 			if i+1 < len(line) && line[i+1] == '*' {
-				nodes = append(nodes, &Bold{Content: buffer.String()})
-				buffer.Reset()
-				state = StateText
+				switch currentNode.(type) {
+				case nil:
+					nodes = append(nodes, &Text{buffer.String()})
+					nodesStack = append(nodesStack, &Bold{Children: []Node{}})
+				case *Bold:
+					if len(nodesStack) == 1 {
+						appendContent(currentNode, buffer.String())
+						nodes = append(nodes, currentNode)
+						nodesStack = nodesStack[:len(nodesStack)-1]
+					} else {
+						appendContent(currentNode, buffer.String())
+						boldNode := nodesStack[len(nodesStack)-1]
+						nodesStack = nodesStack[:len(nodesStack)-1]
+						parentNode := nodesStack[len(nodesStack)-1]
+						appendChildNode(parentNode, boldNode)
+					}
+				default:
+					appendContent(currentNode, buffer.String())
+					nodesStack = append(nodesStack, &Bold{Children: []Node{}})
+				}
 				i++
-				continue
+			} else {
+				switch currentNode.(type) {
+				case nil:
+					nodes = append(nodes, &Text{buffer.String()})
+					nodesStack = append(nodesStack, &Italic{Children: []Node{}})
+				case *Italic:
+					if len(nodesStack) == 1 {
+						appendContent(currentNode, buffer.String())
+						nodes = append(nodes, currentNode)
+						nodesStack = nodesStack[:len(nodesStack)-1]
+					} else {
+						appendContent(currentNode, buffer.String())
+						italicNode := nodesStack[len(nodesStack)-1]
+						nodesStack = nodesStack[:len(nodesStack)-1]
+						parentNode := nodesStack[len(nodesStack)-1]
+						appendChildNode(parentNode, italicNode)
+					}
+				default:
+					appendContent(currentNode, buffer.String())
+					nodesStack = append(nodesStack, &Italic{Children: []Node{}})
+				}
 			}
+			buffer.Reset()
+			continue
 		}
-
-		// if c == '*' && state == StateItalic {
-		//
-		// }
 
 		buffer.WriteByte(c)
 	}
@@ -105,17 +129,9 @@ func parseInlineContent(line string) ([]Node, error) {
 		nodes = append(nodes, &Text{Content: buffer.String()})
 	}
 
-	if state != StateText {
-		var unclosedTag string
-		switch state {
-		case StateBold:
-			unclosedTag = "**"
-		case StateItalic:
-			unclosedTag = "*"
-		case StateLink:
-			unclosedTag = "link"
-		}
-		return nodes, fmt.Errorf("Unclosed tag: %s", unclosedTag)
+	if len(nodesStack) != 0 {
+		// TODO: better indication of unclosed tags
+		return nodes, fmt.Errorf("Unclosed tag: %d", nodesStack[len(nodesStack)-1].Type())
 	}
 
 	return nodes, nil

@@ -30,11 +30,24 @@ func (p *Paragraph) Render() string {
 }
 
 func (t *Text) Render() string {
-	return t.Content
+    return t.Content
 }
 
 func (b *Bold) Render() string {
 	var result strings.Builder
-	fmt.Fprintf(&result, "<strong>%s</strong>", b.Content)
+    fmt.Fprintf(&result, "<strong>")
+	for _, node := range b.Children {
+		result.WriteString(node.Render())
+	}
+    fmt.Fprintf(&result, "</strong>")
+	return result.String()
+}
+func (i *Italic) Render() string {
+	var result strings.Builder
+    fmt.Fprintf(&result, "<em>")
+	for _, node := range i.Children {
+		result.WriteString(node.Render())
+	}
+    fmt.Fprintf(&result, "</em>")
 	return result.String()
 }
