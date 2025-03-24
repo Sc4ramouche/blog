@@ -32,6 +32,9 @@ type Text struct {
 	nodeType NodeType
 }
 
+func newTextNode(content string) *Text {
+	return &Text{Content: content, nodeType: TextNode}
+}
 func (t *Text) Type() NodeType {
 	return t.nodeType
 }
@@ -59,7 +62,7 @@ func newItalicNode() *Italic {
 }
 
 func (i *Italic) Type() NodeType {
-	return ItalicNode
+	return i.nodeType
 }
 
 func appendContent(node InlineNode, content string) {
@@ -84,8 +87,4 @@ func appendChildNode(parent InlineNode, child InlineNode) {
 	case *Italic:
 		p.Children = append(p.Children, child)
 	}
-}
-
-func newTextNode(content string) *Text {
-	return &Text{Content: content, nodeType: TextNode}
 }
