@@ -20,6 +20,7 @@ const (
 	TextNode NodeType = iota
 	ItalicNode
 	BoldNode
+	LinkNode
 )
 
 type InlineNode interface {
@@ -63,6 +64,20 @@ func newItalicNode() *Italic {
 
 func (i *Italic) Type() NodeType {
 	return i.nodeType
+}
+
+type Link struct {
+	Url      string
+	Text     string
+	nodeType NodeType
+}
+
+func newLinkNode() *Link {
+	return &Link{Url: "", Text: "", nodeType: LinkNode}
+}
+
+func (l *Link) Type() NodeType {
+	return l.nodeType
 }
 
 func appendContent(node InlineNode, content string) {

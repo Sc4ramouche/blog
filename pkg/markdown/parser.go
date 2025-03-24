@@ -122,6 +122,49 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 			continue
 		}
 
+		if c == '[' {
+			switch currentNode.(type) {
+			case nil:
+				nodes = append(nodes, newTextNode(buffer.String()))
+				nodesStack = append(nodesStack, newLinkNode())
+			default:
+				appendContent(currentNode, buffer.String())
+				nodesStack = append(nodesStack, newLinkNode())
+			}
+			buffer.Reset()
+			continue
+		}
+
+		if c == ']' {
+			switch currentNode.(type) {
+			case *Link:
+				linkNode := currentNode.(*Link)
+				linkNode.Text = buffer.String()
+			}
+			buffer.Reset()
+			continue
+		}
+
+		if c == '(' && currentNode.Type() == LinkNode {
+			buffer.Reset()
+			continue
+		}
+		if c == ')' && currentNode.Type() == LinkNode {
+			linkNode := currentNode.(*Link)
+			linkNode.Url = buffer.String()
+			buffer.Reset()
+
+			if len(nodesStack) == 1 {
+				nodes = append(nodes, linkNode)
+				nodesStack = nodesStack[:len(nodesStack)-1]
+			} else {
+				nodesStack = nodesStack[:len(nodesStack)-1]
+				parentNode := nodesStack[len(nodesStack)-1]
+				appendChildNode(parentNode, linkNode)
+			}
+			continue
+		}
+
 		buffer.WriteByte(c)
 	}
 
