@@ -130,8 +130,19 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 	}
 
 	if len(nodesStack) != 0 {
-		// TODO: better indication of unclosed tags
-		return nodes, fmt.Errorf("Unclosed tag: %d", nodesStack[len(nodesStack)-1].Type())
+		nodeType := nodesStack[len(nodesStack)-1].Type()
+		var tagName string
+
+		switch nodeType {
+		case BoldNode:
+			tagName = "bold (**)"
+		case ItalicNode:
+			tagName = "italic (*)"
+		default:
+			tagName = "unknown"
+		}
+
+		return nodes, fmt.Errorf("unclosed %s tag", tagName)
 	}
 
 	return nodes, nil
