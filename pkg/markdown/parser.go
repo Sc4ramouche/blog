@@ -77,7 +77,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 			if i+1 < len(line) && line[i+1] == '*' {
 				switch currentNode.(type) {
 				case nil:
-					nodes = append(nodes, &Text{buffer.String()})
+					nodes = append(nodes, newTextNode(buffer.String()))
 					nodesStack = append(nodesStack, &Bold{Children: []Node{}})
 				case *Bold:
 					if len(nodesStack) == 1 {
@@ -99,7 +99,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 			} else {
 				switch currentNode.(type) {
 				case nil:
-					nodes = append(nodes, &Text{buffer.String()})
+					nodes = append(nodes, newTextNode(buffer.String()))
 					nodesStack = append(nodesStack, &Italic{Children: []Node{}})
 				case *Italic:
 					if len(nodesStack) == 1 {
@@ -126,7 +126,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 	}
 
 	if buffer.Len() != 0 {
-		nodes = append(nodes, &Text{Content: buffer.String()})
+		nodes = append(nodes, newTextNode(buffer.String()))
 	}
 
 	if len(nodesStack) != 0 {
