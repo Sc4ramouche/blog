@@ -13,6 +13,21 @@ type Heading struct {
 type Paragraph struct {
 	Children []InlineNode
 }
+type ListItem struct {
+	Children []InlineNode
+}
+
+func newListItem(content []InlineNode) *ListItem {
+	return &ListItem{Children: content}
+}
+
+type List struct {
+	Children []ListItem
+}
+
+func newList() *List {
+	return &List{Children: []ListItem{}}
+}
 
 type NodeType int
 

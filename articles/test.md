@@ -10,4 +10,11 @@ Throwing in a [link node](https://github.com) mix.
 
 Can a **bold link [exist](github.com) in this** world?
 
-Weird statement with a random [ in it.
+Weird statement with a random in it.
+
+- what about a list?
+- can we **successfully** support it?
+
+I hope we can.
+
+

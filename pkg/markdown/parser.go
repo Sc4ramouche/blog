@@ -11,25 +11,41 @@ func parseFile(file *os.File) (*Document, error) {
 	scanner := bufio.NewScanner(file)
 
 	var document Document
+	var currentList *List
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		if len(line) == 0 {
+			if currentList != nil {
+				document.Children = append(document.Children, currentList)
+				currentList = nil
+			}
 			continue
 		}
 
-		var node Node
-		firstChar := line[0]
-		switch firstChar {
-		case '#':
-			node = parseHeading(line)
-		default:
-			// Note: markdown specification treats consequitive non-empty lines
-			// as a single paragraph. In my implementation single paragraph
-			// is represented by single line. Maybe I'll reconsider later.
-			node = parseParagraph(line)
+		if isListMarker(line) {
+			if currentList == nil {
+				currentList = newList()
+			}
+			parseListItem(currentList, line)
+		} else {
+			var node Node
+			firstChar := line[0]
+			switch firstChar {
+			case '#':
+				node = parseHeading(line)
+			default:
+				// Note: markdown specification treats consequitive non-empty lines
+				// as a single paragraph. In my implementation single paragraph
+				// is represented by single line. Maybe I'll reconsider later.
+				node = parseParagraph(line)
+			}
+			document.Children = append(document.Children, node)
 		}
-		document.Children = append(document.Children, node)
+	}
+
+	if currentList != nil {
+		document.Children = append(document.Children, currentList)
 	}
 
 	return &document, nil
@@ -56,6 +72,25 @@ func parseParagraph(line string) Node {
 		fmt.Println("Inline parse error:", err)
 	}
 	return &Paragraph{Children: inlineNodes}
+}
+
+func parseListItem(list *List, line string) {
+	contentIndex := 0
+	for _, char := range line {
+		if char == '-' {
+			break
+		} else {
+			contentIndex++
+		}
+	}
+	content := line[contentIndex+1:]
+	fmt.Println("Content:", content)
+	inlineNodes, err := parseInlineContent(content)
+	if err != nil {
+		fmt.Println("Inline parse error:", err)
+	}
+	listItem := newListItem(inlineNodes)
+	list.Children = append(list.Children, *listItem)
 }
 
 // TODO: Debug view for AST could be handy
@@ -189,4 +224,9 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 	}
 
 	return nodes, nil
+}
+
+func isListMarker(line string) bool {
+	trimmed := strings.TrimSpace(line)
+	return strings.HasPrefix(trimmed, "- ")
 }

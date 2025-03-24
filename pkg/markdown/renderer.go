@@ -42,6 +42,7 @@ func (b *Bold) Render() string {
 	fmt.Fprintf(&result, "</strong>")
 	return result.String()
 }
+
 func (i *Italic) Render() string {
 	var result strings.Builder
 	fmt.Fprintf(&result, "<em>")
@@ -56,4 +57,24 @@ func (l *Link) Render() string {
 	var results strings.Builder
 	fmt.Fprintf(&results, "<a href=\"%s\">%s</a>", l.Url, l.Text)
 	return results.String()
+}
+
+func (li *ListItem) Render() string {
+	var result strings.Builder
+	fmt.Fprintf(&result, "<li>")
+	for _, node := range li.Children {
+		fmt.Fprintf(&result, node.Render())
+	}
+	fmt.Fprintf(&result, "</li>")
+	return result.String()
+}
+
+func (l *List) Render() string {
+	var result strings.Builder
+	fmt.Fprintf(&result, "<ul>")
+	for _, listItem := range l.Children {
+		fmt.Fprintf(&result, listItem.Render())
+	}
+	fmt.Fprintf(&result, "</ul>")
+	return result.String()
 }
