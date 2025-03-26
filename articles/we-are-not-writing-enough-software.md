@@ -1,3 +1,8 @@
+---
+title: We are not writing enough software
+date: 11-03-2025
+---
+
 # We are not writing enough software 
 
 Writing random software is essential, as is starting new projects, even if you abandon them.

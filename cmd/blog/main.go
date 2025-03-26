@@ -15,7 +15,8 @@ type Preview struct {
 }
 
 type Post struct {
-	Body template.HTML
+	Body  template.HTML
+	Title string
 }
 
 var templates = template.Must(template.ParseGlob("templates/*.html"))
@@ -35,7 +36,7 @@ func generatePost(path string, outputDir string, filename string) {
 		log.Fatalf("Failed to parse markdown file: %s", path)
 	}
 	htmlContent := document.Render()
-	post := Post{Body: template.HTML(htmlContent)}
+	post := Post{Body: template.HTML(htmlContent), Title: document.Title}
 	postFile, _ := os.Create(filepath.Join(outputDir, filename))
 	defer postFile.Close()
 

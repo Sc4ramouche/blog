@@ -1,3 +1,8 @@
+---
+title: Hello World
+date: 02-03-2025
+---
+
 # Hello World
 
 Writing has been bringing me enormous joy recently. Hence the blog.
