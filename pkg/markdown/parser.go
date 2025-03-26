@@ -11,6 +11,31 @@ func parseFile(file *os.File) (*Document, error) {
 	scanner := bufio.NewScanner(file)
 
 	var document Document
+
+	if scanner.Scan() && scanner.Text() == "---" {
+		for scanner.Scan() {
+			line := scanner.Text()
+			if line == "---" {
+				break
+			}
+
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				key := strings.TrimSpace(parts[0])
+				value := strings.TrimSpace(parts[1])
+				switch key {
+				case "title":
+					document.Title = value
+				case "date":
+					document.Date = value
+				}
+			}
+		}
+	} else {
+		file.Seek(0, 0)
+		scanner = bufio.NewScanner(file)
+	}
+
 	listStack := []*List{}
 	currentIndentationLevel := 0
 

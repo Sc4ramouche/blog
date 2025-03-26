@@ -5,6 +5,8 @@ type Node interface {
 }
 type Document struct {
 	Children []Node
+    Title string
+    Date string
 }
 type Heading struct {
 	Level   int
