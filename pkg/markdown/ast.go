@@ -14,7 +14,9 @@ type Paragraph struct {
 	Children []InlineNode
 }
 type ListItem struct {
-	Children []InlineNode
+	Children   []InlineNode
+	NestedList *List
+	Level      int
 }
 
 func newListItem(content []InlineNode) *ListItem {
@@ -23,10 +25,17 @@ func newListItem(content []InlineNode) *ListItem {
 
 type List struct {
 	Children []ListItem
+	Level    int
 }
 
-func newList() *List {
-	return &List{Children: []ListItem{}}
+func (l *List) addNestedList(list *List) {
+	if len(l.Children) > 0 {
+		l.Children[len(l.Children)-1].NestedList = list
+	}
+}
+
+func newList(level int) *List {
+	return &List{Children: []ListItem{}, Level: level}
 }
 
 type NodeType int

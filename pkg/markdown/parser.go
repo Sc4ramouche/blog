@@ -11,22 +11,40 @@ func parseFile(file *os.File) (*Document, error) {
 	scanner := bufio.NewScanner(file)
 
 	var document Document
-	var currentList *List
+	listStack := []*List{}
+	currentIndentationLevel := 0
+
 	for scanner.Scan() {
 		line := scanner.Text()
 
 		if len(line) == 0 {
-			if currentList != nil {
-				document.Children = append(document.Children, currentList)
-				currentList = nil
+			if len(listStack) > 0 {
+				headList := listStack[0]
+				document.Children = append(document.Children, headList)
+				listStack = listStack[:0]
+				currentIndentationLevel = 0
 			}
 			continue
 		}
 
 		if isListMarker(line) {
-			if currentList == nil {
-				currentList = newList()
+			newLineIndentationLevel := determineIndentation(line)
+			if len(listStack) == 0 {
+				listStack = append(listStack, newList(0))
+			} else if newLineIndentationLevel > currentIndentationLevel {
+				topmostList := listStack[len(listStack)-1]
+				newListNode := newList(newLineIndentationLevel)
+				topmostList.addNestedList(newListNode)
+				listStack = append(listStack, newListNode)
+				currentIndentationLevel = newLineIndentationLevel
+			} else {
+				for len(listStack) > 1 && listStack[len(listStack)-1].Level > newLineIndentationLevel {
+					listStack = listStack[:len(listStack)-1]
+				}
+				currentIndentationLevel = newLineIndentationLevel
 			}
+
+			currentList := listStack[len(listStack)-1]
 			parseListItem(currentList, line)
 		} else {
 			var node Node
@@ -44,8 +62,8 @@ func parseFile(file *os.File) (*Document, error) {
 		}
 	}
 
-	if currentList != nil {
-		document.Children = append(document.Children, currentList)
+	if len(listStack) > 0 {
+		document.Children = append(document.Children, listStack[0])
 	}
 
 	return &document, nil
@@ -75,16 +93,8 @@ func parseParagraph(line string) Node {
 }
 
 func parseListItem(list *List, line string) {
-	contentIndex := 0
-	for _, char := range line {
-		if char == '-' {
-			break
-		} else {
-			contentIndex++
-		}
-	}
-	content := line[contentIndex+1:]
-	fmt.Println("Content:", content)
+	contentIndex := strings.Index(line, "- ")
+	content := line[contentIndex+2:]
 	inlineNodes, err := parseInlineContent(content)
 	if err != nil {
 		fmt.Println("Inline parse error:", err)
@@ -229,4 +239,9 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 func isListMarker(line string) bool {
 	trimmed := strings.TrimSpace(line)
 	return strings.HasPrefix(trimmed, "- ")
+}
+
+func determineIndentation(line string) int {
+	index := strings.Index(line, "- ")
+	return index / 2
 }

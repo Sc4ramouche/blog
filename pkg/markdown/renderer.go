@@ -61,11 +61,14 @@ func (l *Link) Render() string {
 
 func (li *ListItem) Render() string {
 	var result strings.Builder
-	fmt.Fprintf(&result, "<li>")
+    result.WriteString("<li>")
 	for _, node := range li.Children {
-		fmt.Fprintf(&result, node.Render())
+        result.WriteString(node.Render())
 	}
-	fmt.Fprintf(&result, "</li>")
+	if li.NestedList != nil {
+		result.WriteString(li.NestedList.Render())
+	}
+    result.WriteString("</li>")
 	return result.String()
 }
 
