@@ -1,3 +1,7 @@
+---
+draft: true
+---
+
 # Building a parser for my blog
 
 When I started this blog, I was quite satisfied with how simple it turned out.
@@ -14,7 +18,7 @@ First, I asked if it is possible to build markdown to html parser in under a tho
 
 Then I asked LLM to suggest a project structure which would align with idiomatic go approach to structure code. I must say that `/cmd` and `/pkg` was a bit confusing for me before, but in the example of building a parser, I think, it finally clicked with me, how these two folder work together. Small win!
 
-I was suggested to do a `/pkg/parses.go` and `/pkg/renderer.go`. At this point, my understanding was that I will have to traverse the markdown file, i.e. parse, however I was not sure what `renderer.go` would be responsible for. Which lead me to another prompt.
+I was suggested to do a `/pkg/parser.go` and `/pkg/renderer.go`. At this point, my understanding was that I will have to traverse the markdown file, i.e. parse, however I was not sure what `renderer.go` would be responsible for. Which lead me to another prompt.
 
 I asked what would be very high level picture of how this parser would work, and LLM outlined it for me as `Markdown -> parser -> AST -> renderer -> HTML`. 
 

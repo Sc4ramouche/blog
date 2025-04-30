@@ -28,6 +28,8 @@ func parseFile(file *os.File) (*Document, error) {
 					document.Title = value
 				case "date":
 					document.Date = value
+				case "draft":
+					document.Draft = value
 				}
 			}
 		}
@@ -264,6 +266,7 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 			}
 			continue
 		}
+
 
 		buffer.WriteByte(c)
 	}
