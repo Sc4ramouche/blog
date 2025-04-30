@@ -3,8 +3,6 @@ title: We are not writing enough software
 date: 11-03-2025
 ---
 
-# We are not writing enough software 
-
 Writing random software is essential, as is starting new projects, even if you abandon them.
 
 I believe it is fair to say that the work we are paid for mostly orbits around long-lived software. When we spend some time with a long-lived piece of software, we get a rough idea how it works and how it is delivered. However, if the system is big enough, working with it can often feel like navigating within many constraints. For most of the changes we intend, we have to account for a heavy context that is inherent to complex systems.
