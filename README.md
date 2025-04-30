@@ -14,3 +14,5 @@ When I started the blog, the only dependecy I had was the markdown to html parse
 * Sanitise HTML
 * Implement `Stringer` interface for AST nodes, so that they can be neatly printed.
 * Maybe ordered lists
+* Sort articles on the home page
+* Display date within articles
