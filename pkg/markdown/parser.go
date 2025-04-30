@@ -142,6 +142,36 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 		} else {
 			currentNode = nil
 		}
+        
+		if c == '`' {
+			switch currentNode.(type) {
+			case nil:
+				nodes = append(nodes, newTextNode(buffer.String()))
+				nodesStack = append(nodesStack, newInlineCodeNode())
+			case *InlineCode:
+				if len(nodesStack) == 1 {
+					appendContent(currentNode, buffer.String())
+					nodes = append(nodes, currentNode)
+					nodesStack = nodesStack[:len(nodesStack)-1]
+				} else {
+					appendContent(currentNode, buffer.String())
+					inlineCodeNode := nodesStack[len(nodesStack)-1]
+					nodesStack = nodesStack[:len(nodesStack)-1]
+					parentNode := nodesStack[len(nodesStack)-1]
+					appendChildNode(parentNode, inlineCodeNode)
+				}
+			default:
+				appendContent(currentNode, buffer.String())
+				nodesStack = append(nodesStack, newItalicNode())
+			}
+			buffer.Reset()
+            continue
+		}
+
+        if currentNode != nil && currentNode.Type() == InlineCodeNode {
+            buffer.WriteByte(c)
+            continue
+        }
 
 		if c == '*' {
 			if i+1 < len(line) && line[i+1] == '*' {

@@ -5,8 +5,10 @@ type Node interface {
 }
 type Document struct {
 	Children []Node
-    Title string
-    Date string
+	Title    string
+	Date     string
+	Draft    string
+	Path     string
 }
 type Heading struct {
 	Level   int
@@ -46,6 +48,7 @@ const (
 	TextNode NodeType = iota
 	ItalicNode
 	BoldNode
+	InlineCodeNode
 	LinkNode
 )
 
@@ -106,6 +109,19 @@ func (l *Link) Type() NodeType {
 	return l.nodeType
 }
 
+type InlineCode struct {
+	Children []Node
+	nodeType NodeType
+}
+
+func newInlineCodeNode() *InlineCode {
+	return &InlineCode{Children: []Node{}, nodeType: InlineCodeNode}
+}
+
+func (c *InlineCode) Type() NodeType {
+	return c.nodeType
+}
+
 func appendContent(node InlineNode, content string) {
 	if content == "" {
 		return
@@ -117,6 +133,8 @@ func appendContent(node InlineNode, content string) {
 	case *Bold:
 		n.Children = append(n.Children, newTextNode(content))
 	case *Italic:
+		n.Children = append(n.Children, newTextNode(content))
+	case *InlineCode:
 		n.Children = append(n.Children, newTextNode(content))
 	}
 }

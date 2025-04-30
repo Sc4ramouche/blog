@@ -81,3 +81,13 @@ func (l *List) Render() string {
 	fmt.Fprintf(&result, "</ul>")
 	return result.String()
 }
+
+func (i *InlineCode) Render() string {
+	var result strings.Builder
+	fmt.Fprintf(&result, "<code>")
+	for _, node := range i.Children {
+		result.WriteString(node.Render())
+	}
+	fmt.Fprintf(&result, "</code>")
+	return result.String()
+}
