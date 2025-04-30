@@ -245,11 +245,11 @@ func parseInlineContent(line string) ([]InlineNode, error) {
 			continue
 		}
 
-		if c == '(' && currentNode.Type() == LinkNode {
+		if c == '(' && currentNode != nil && currentNode.Type() == LinkNode {
 			buffer.Reset()
 			continue
 		}
-		if c == ')' && currentNode.Type() == LinkNode {
+		if c == ')' && currentNode != nil && currentNode.Type() == LinkNode {
 			linkNode := currentNode.(*Link)
 			linkNode.Url = buffer.String()
 			buffer.Reset()
