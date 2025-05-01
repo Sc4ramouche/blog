@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 func parseFile(file *os.File) (*Document, error) {
@@ -27,7 +28,11 @@ func parseFile(file *os.File) (*Document, error) {
 				case "title":
 					document.Title = value
 				case "date":
-					document.Date = value
+                    date, err := time.Parse("02-01-2006", value)
+                    if err != nil {
+                        continue 
+                    }
+					document.Date = date
 				case "draft":
 					document.Draft = value
 				}

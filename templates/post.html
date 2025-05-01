@@ -23,9 +23,15 @@
         </nav>
     </header>
     <main>
+        {{ if .Title }}
         <h1>{{.Title}}</h1>
+        {{ end }}
+        {{ if .Date }}
+        <time datetime="{{ .Date.Format "2006-02-01" }}">{{.Date.Format "January 2, 2006" }}</time>
+        {{ end }}
         {{.Body}}
     </main>
+
 </body>
 
 </html>

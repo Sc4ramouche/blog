@@ -6,18 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/Sc4ramouche/blog/pkg/markdown"
 )
 
-type Preview struct {
-	Title string
-	Link  string
-}
-
 type Post struct {
 	Body  template.HTML
 	Title string
+	Date  time.Time
 }
 
 var templates = template.Must(template.ParseGlob("templates/*.html"))
@@ -65,7 +62,7 @@ func parsePost(path string) *markdown.Document {
 
 func generatePost(document *markdown.Document, outputDir string) {
 	htmlContent := document.Render()
-	post := Post{Body: template.HTML(htmlContent), Title: document.Title}
+	post := Post{Body: template.HTML(htmlContent), Title: document.Title, Date: document.Date}
 	postFile, _ := os.Create(filepath.Join(outputDir, document.Path))
 	defer postFile.Close()
 

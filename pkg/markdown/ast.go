@@ -1,12 +1,14 @@
 package markdown
 
+import "time"
+
 type Node interface {
 	Render() string
 }
 type Document struct {
 	Children []Node
 	Title    string
-	Date     string
+	Date     time.Time
 	Draft    string
 	Path     string
 }
